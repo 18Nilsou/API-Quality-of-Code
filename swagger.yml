@@ -14,15 +14,19 @@ paths:
         - Games
       responses:
         '200':
-          description: Succès
+          description: Ok
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Game'
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
     post:
-      summary: create a game
+      summary: Create a game
       tags:
         - Games
       requestBody:
@@ -33,10 +37,14 @@ paths:
               $ref: '#/components/schemas/Game'
       responses:
         '201':
-          description: Créé 
+          description: Ok 
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
   /games/{id}:  
     put:
-      summary: update a game
+      summary: Update a game
       tags:
         - Games
       parameters:
@@ -54,15 +62,21 @@ paths:
               $ref: '#/components/schemas/Game'
       responses:
         '200':
-          description: Succès
+          description: Ok
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Game'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
     delete:
+      summary: Delete a game
       tags:
         - Games
-      summary: delete a game
       parameters:
         - in: path 
           name: id
@@ -72,151 +86,367 @@ paths:
           description: id of the game
       responses:
         '204':
-          description: Succès
+          description: Ok
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
   
-  /political-party:
+  /users:
     get:
+      summary: Get users
       tags:
-        - Political Parties
-      summary: Get political party
+        - Users
       responses:
         '200':
-          description: Succès
+          description: Ok
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/PoliticalParty'
+                  $ref: '#/components/schemas/User'
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
     post:
+      summary: Create a user
       tags:
-        - Political Parties
-      summary: create a political party
+        - Users
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PoliticalParty'
+              $ref: '#/components/schemas/User'
       responses:
         '201':
-          description: Créé 
-  /political-party/{id}:  
+          description: Ok 
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+  /users/{id}:  
     put:
+      summary: Update a user
       tags:
-        - Political Parties
-      summary: update a political party
+        - Users
       parameters:
         - in: path 
           name: id
           schema:
             type: integer
           required: true
-          description: id of the political party
+          description: id of the user
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PoliticalParty'
+              $ref: '#/components/schemas/User'
       responses:
         '200':
-          description: Succès
+          description: Ok
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PoliticalParty'
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
     delete:
+      summary: Delete a user
       tags:
-        - Political Parties
-      summary: delete a PoliticalParty
+        - Users
       parameters:
         - in: path 
           name: id
           schema:
             type: integer
           required: true
-          description: id of the PoliticalParty
+          description: id of the user
       responses:
         '204':
-          description: Succès
-  
-  /data/{userId}:
-    get:
-      tags:
-        - Data
-      summary: Get user data
-      parameters:
-        - in: path 
-          name: userId
-          schema:
-            type: integer
-          required: true
-          description: user id
-      responses:
-        '200':
-          description: Succès
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Data'
+          description: Ok
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+          
   /data:
     get:
+      summary: Get all data
       tags:
-        - Data
-      summary: Get user data
+        - Aggregate
       responses:
         '200':
-          description: Succès
+          description: Ok
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Data'
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+  /data/{userId}:
+    get:
+      summary: Get user data
+      tags:
+        - Aggregate
+      parameters:
+        - in: path 
+          name: userId
+          schema:
+            type: integer
+          required: true
+          description: id of the user
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Data'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /data/nationality/{nationality}:
+    get:
+      summary: Get games by nationality
+      tags:
+        - Aggregate
+      parameters:
+        - in: path 
+          name: nationality
+          schema:
+            type: string
+          required: true
+          description: nationality of the users
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Game'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /data/age/{age}:
+    get:
+      summary: Get games by age
+      tags:
+        - Aggregate
+      parameters:
+        - in: path 
+          name: age
+          schema:
+            type: integer
+          required: true
+          description: age of the users
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Game'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /data/sex/{sex}:
+    get:
+      summary: Get games by sex
+      tags:
+        - Aggregate
+      parameters:
+        - in: path 
+          name: sex
+          schema:
+            type: string
+          required: true
+          description: sex of the users
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Game'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /data/political-opinion/{politicalOpinion}:
+    get:
+      summary: Get games by political opinion
+      tags:
+        - Aggregate
+      parameters:
+        - in: path 
+          name: politicalOpinion
+          schema:
+            type: string
+          required: true
+          description: political opinion of the users
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Game'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /data/game-type/{type}:
+    get:
+      summary: Get top 3 political opinion per game type
+      tags:
+        - Aggregate
+      parameters:
+        - in: path 
+          name: type
+          schema:
+            type: string
+          required: true
+          description: political opinion of the users
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /data/game-inde/{isInde}:
+    get:
+      summary: Get top 3 nationality ...
+      tags:
+        - Aggregate
+      parameters:
+        - in: path 
+          name: isInde
+          schema:
+            type: boolean
+          required: true
+          description: isInde
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
 components:
   schemas:
     Game:
       type: object
       required:
         - name
-        - rank
+        - type
+        - pegi
+        - award
+        - indie
+        - multiplayer
+        - competitive
       properties:
         id:
           type: integer
         name:
           type: string
-        rank:
+        type:
           type: string
-    PoliticalParty:
-      type: object
-      required:
-        - name
-      properties:
-        id:
+        pegi:
           type: integer
-        name:
-          type: string
+        award:
+          type: boolean
+        indie:
+          type: boolean
+        multiplayer:
+          type: boolean
+        competitive:
+          type: boolean
     User:
       type: object
       required:
-        - id
+        - age
+        - sex
+        - job
+        - politicalOpinion
+        - nationality
       properties:
         id:
           type: integer
+        age:
+          type: integer
+        sex:
+          type: string
+        job:
+          type: string
+        politicalOpinion:
+          type: string
+        nationality:
+          type: string
     Data:
       type: object
       required:
-        - id
         - games
-        - politicalParty
-        - user
+        - users
       properties:
-        id:
-          $ref: '#/components/schemas/User'
         games:
           type: array
           items:
             $ref: '#/components/schemas/Game'
-        politicalParty:
-          $ref: '#/components/schemas/PoliticalParty'
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
