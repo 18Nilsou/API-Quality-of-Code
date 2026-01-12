@@ -1,0 +1,222 @@
+openapi: 3.0.0
+info:
+  title: QoC API
+  description: Documentation Swagger pour une API exemple.
+  version: 0.0.1
+servers:
+  - url: http://localhost:3000/api
+
+paths:
+  /games:
+    get:
+      summary: Get games
+      tags:
+        - Games
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Game'
+    post:
+      summary: create a game
+      tags:
+        - Games
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Game'
+      responses:
+        '201':
+          description: Créé 
+  /games/{id}:  
+    put:
+      summary: update a game
+      tags:
+        - Games
+      parameters:
+        - in: path 
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: id of the game
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Game'
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+    delete:
+      tags:
+        - Games
+      summary: delete a game
+      parameters:
+        - in: path 
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: id of the game
+      responses:
+        '204':
+          description: Succès
+  
+  /political-party:
+    get:
+      tags:
+        - Political Parties
+      summary: Get political party
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PoliticalParty'
+    post:
+      tags:
+        - Political Parties
+      summary: create a political party
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PoliticalParty'
+      responses:
+        '201':
+          description: Créé 
+  /political-party/{id}:  
+    put:
+      tags:
+        - Political Parties
+      summary: update a political party
+      parameters:
+        - in: path 
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: id of the political party
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PoliticalParty'
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PoliticalParty'
+    delete:
+      tags:
+        - Political Parties
+      summary: delete a PoliticalParty
+      parameters:
+        - in: path 
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: id of the PoliticalParty
+      responses:
+        '204':
+          description: Succès
+  
+  /data/{userId}:
+    get:
+      tags:
+        - Data
+      summary: Get user data
+      parameters:
+        - in: path 
+          name: userId
+          schema:
+            type: integer
+          required: true
+          description: user id
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Data'
+  /data:
+    get:
+      tags:
+        - Data
+      summary: Get user data
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Data'
+components:
+  schemas:
+    Game:
+      type: object
+      required:
+        - name
+        - rank
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        rank:
+          type: string
+    PoliticalParty:
+      type: object
+      required:
+        - name
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    User:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+    Data:
+      type: object
+      required:
+        - id
+        - games
+        - politicalParty
+        - user
+      properties:
+        id:
+          $ref: '#/components/schemas/User'
+        games:
+          type: array
+          items:
+            $ref: '#/components/schemas/Game'
+        politicalParty:
+          $ref: '#/components/schemas/PoliticalParty'
