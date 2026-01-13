@@ -21,32 +21,32 @@ describe('UserService', () => {
     });
 
     it('listUsers retourne la liste fournie par le repo', async () => {
-        const sample: User[] = [new User(25, 'M', 'Engineer', 'Reconquête', 'French', 1), new User(30, 'F', 'Unemployed', 'RN', 'French', 2)];
+        const sample: User[] = [new User(25, 'M', 'Engineer', 'Reconquête', 'French', [], 1), new User(30, 'F', 'Unemployed', 'RN', 'French', [], 2)];
         mockRepo.findAll.mockResolvedValue(sample);
         await expect(service.listUsers()).resolves.toEqual(sample);
         expect(mockRepo.findAll).toHaveBeenCalledTimes(1);
     });
 
     it('createUser appelle save et retourne l\'utilisateur créé', async () => {
-        const input = new User(25, 'M', 'Engineer', 'Reconquête', 'French');
-        const { age, sex, job, politicalOpinion, nationality } = input;
-        const saved = new User(age, sex, job, politicalOpinion, nationality, 1);
+        const input = new User(25, 'M', 'Engineer', 'Reconquête', 'French', []);
+        const { age, sex, job, politicalOpinion, nationality, favoriteGames } = input;
+        const saved = new User(age, sex, job, politicalOpinion, nationality, favoriteGames, 1);
         mockRepo.save.mockResolvedValue(saved);
         await expect(service.createUser(input)).resolves.toEqual(saved);
         expect(mockRepo.save).toHaveBeenCalledWith(input);
     });
 
     it('updateUser appelle update et retourne l\'utilisateur mis à jour', async () => {
-        const input = new User(25, 'M', 'Engineer', 'Reconquête', 'French', 1);
-        const { age, sex, job, politicalOpinion, nationality, id } = input;
-        const updated = new User(age, sex, 'Unemployed', politicalOpinion, nationality, id);
+        const input = new User(25, 'M', 'Engineer', 'Reconquête', 'French', [], 1);
+        const { age, sex, job, politicalOpinion, nationality, favoriteGames, id } = input;
+        const updated = new User(age, sex, 'Unemployed', politicalOpinion, nationality, favoriteGames, id);
         mockRepo.update.mockResolvedValue(updated);
         await expect(service.updateUser(1, input)).resolves.toEqual(updated);
         expect(mockRepo.update).toHaveBeenCalledWith(1, input);
     });
 
     it('updateUser retourne null si l\'utilisateur n\'existe pas', async () => {
-        const input = new User(25, 'M', 'Engineer', 'Reconquête', 'French', 1);
+        const input = new User(25, 'M', 'Engineer', 'Reconquête', 'French', [], 1);
         mockRepo.update.mockResolvedValue(null);
         await expect(service.updateUser(999, input)).resolves.toBeNull();
         expect(mockRepo.update).toHaveBeenCalledWith(999, input);

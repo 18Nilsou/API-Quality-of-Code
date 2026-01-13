@@ -16,6 +16,8 @@ import { GameController } from './adapters/driving/gameController';
 import { InMemoryGameRepo } from "./adapters/driven/inMemoryGameRepo";
 import { GameService } from "./services/gameService";
 import { HttpError } from './domain/error/httpError';
+import { AggregateService } from './services/aggregateService';
+import { AggregateController } from './adapters/driving/aggregateController';
 
 const app = express();
 app.use(express.json());
@@ -40,6 +42,10 @@ userController.registerRoutes(app);
 const gameService = new GameService(gameRepo);
 const gameController = new GameController(gameService);
 gameController.registerRoutes(app);
+
+const aggregateService = new AggregateService(userRepo, gameRepo);
+const aggregateController = new AggregateController(aggregateService);
+aggregateController.registerRoutes(app);
 
 app.use((err: HttpError, req: Request, res: Response, next: Function) => {
   if (err.statusCode) {

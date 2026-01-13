@@ -12,7 +12,7 @@ describe('inMemoryUserRepo', () => {
     })
 
     it('should save a user', async () => {
-        const userData = new User(25, 'M', 'Engineer', 'Reconquête', 'French');
+        const userData = new User(25, 'M', 'Engineer', 'Reconquête', 'French', []);
         const savedUser = await repo.save(userData);
 
         expect(savedUser).toHaveProperty('id');
@@ -21,7 +21,7 @@ describe('inMemoryUserRepo', () => {
     });
 
     it('should get all users by duplicating variable', async () => {
-        users = [new User(25, 'M', 'Engineer', 'Reconquête', 'French', 1)];
+        users = [new User(25, 'M', 'Engineer', 'Reconquête', 'French', [], 1)];
         repo = new InMemoryUserRepo(users);
         const allUsers = await repo.findAll();
 
@@ -30,9 +30,9 @@ describe('inMemoryUserRepo', () => {
     });
 
     it('should update an existing user', async () => {
-        users = [new User(25, 'M', 'Engineer', 'Reconquête', 'French', 1)];
+        users = [new User(25, 'M', 'Engineer', 'Reconquête', 'French', [], 1)];
         repo = new InMemoryUserRepo(users);
-        const updatedData = new User(26, 'M', 'Engineer', 'Reconquête', 'French', 1);
+        const updatedData = new User(26, 'M', 'Engineer', 'Reconquête', 'French', [], 1);
         const updatedUser = await repo.update(1, updatedData);
 
         expect(updatedUser).not.toBeNull();
@@ -41,14 +41,14 @@ describe('inMemoryUserRepo', () => {
     });
 
     it('should return null when updating a non-existing user', async () => {
-        const updatedData = new User(26, 'M', 'Engineer', 'Reconquête', 'French', 1);
+        const updatedData = new User(26, 'M', 'Engineer', 'Reconquête', 'French', [], 1);
         const result = await repo.update(999, updatedData);
 
         expect(result).toBeNull();
     });
 
     it('should delete an existing user', async () => {
-        users = [new User(25, 'M', 'Engineer', 'Reconquête', 'French', 1)];
+        users = [new User(25, 'M', 'Engineer', 'Reconquête', 'French', [], 1)];
         repo = new InMemoryUserRepo(users);
         const result = await repo.delete(1);
 

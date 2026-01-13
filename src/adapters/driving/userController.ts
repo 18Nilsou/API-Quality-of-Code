@@ -8,7 +8,7 @@ export class UserController {
 
     private service: UserPort;
     private URL_PREFIX = '/users';
-    private requiredFields = ['age', 'sex', 'job', 'politicalOpinion', 'nationality'];
+    private REQUIRED_FIELDS = ['age', 'sex', 'job', 'politicalOpinion', 'nationality', 'favoriteGames'];
 
     constructor(private readonly userService: UserPort) {
         this.service = userService;
@@ -28,12 +28,12 @@ export class UserController {
 
     async createUser(req: Request, res: Response, next: Function) {
         if (!this.checkRequiredFields(req.body)) {
-            return next(new BadRequestError('age, sex, job, politicalOpinion and nationality required'));
+            return next(new BadRequestError('age, sex, job, politicalOpinion, nationality and favoriteGames required'));
         }
 
-        const { age, sex, job, politicalOpinion, nationality } = req.body;
+        const { age, sex, job, politicalOpinion, nationality, favoriteGames } = req.body;
 
-        const created = await this.service.createUser(new User(age, sex, job, politicalOpinion, nationality));
+        const created = await this.service.createUser(new User(age, sex, job, politicalOpinion, nationality, favoriteGames));
         res.status(201).json(created);
     }
 
@@ -42,12 +42,12 @@ export class UserController {
         if (isNaN(id)) return next(new BadRequestError('User ID must be a number'));
 
         if (!this.checkRequiredFields(req.body)) {
-            return next(new BadRequestError('age, sex, job, politicalOpinion and nationality required'));
+            return next(new BadRequestError('age, sex, job, politicalOpinion, nationality and favoriteGames required'));
         }
 
-        const { age, sex, job, politicalOpinion, nationality } = req.body;
+        const { age, sex, job, politicalOpinion, nationality, favoriteGames } = req.body;
 
-        const updated = await this.service.updateUser(id, new User(age, sex, job, politicalOpinion, nationality));
+        const updated = await this.service.updateUser(id, new User(age, sex, job, politicalOpinion, nationality, favoriteGames, id));
         if (!updated) return next(new NotFoundError('User not found'));
         res.status(200).json(updated);
     }
@@ -63,7 +63,7 @@ export class UserController {
     }
 
     private checkRequiredFields(body: any): boolean {
-        for (const field of this.requiredFields) {
+        for (const field of this.REQUIRED_FIELDS) {
             if (!(field in body)) {
                 return false;
             }

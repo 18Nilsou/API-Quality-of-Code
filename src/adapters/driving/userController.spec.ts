@@ -23,7 +23,7 @@ describe('UserController', () => {
     });
 
     it('listUsers retourne la liste des utilisateurs', async () => {
-        const sample: User[] = [new User(25, 'M', 'Engineer', 'Reconquête', 'French', 1), new User(30, 'F', 'Unemployed', 'RN', 'French', 2)];
+        const sample: User[] = [new User(25, 'M', 'Engineer', 'Reconquête', 'French', [], 1), new User(30, 'F', 'Unemployed', 'RN', 'French', [], 2)];
         mockPort.listUsers.mockResolvedValue(sample);
 
         const mockReq = {} as any;
@@ -40,8 +40,8 @@ describe('UserController', () => {
     });
 
     it('createUser crée un utilisateur et le retourne', async () => {
-        const input = new User(25, 'M', 'Engineer', 'Reconquête', 'French');
-        const saved = new User(25, 'M', 'Engineer', 'Reconquête', 'French', 1);
+        const input = new User(25, 'M', 'Engineer', 'Reconquête', 'French', []);
+        const saved = new User(25, 'M', 'Engineer', 'Reconquête', 'French', [], 1);
         mockPort.createUser.mockResolvedValue(saved);
 
         const mockReq = {
@@ -69,12 +69,12 @@ describe('UserController', () => {
 
         await controller.createUser(mockReq, mockRes, mockNext);
 
-        expect(mockNext).toHaveBeenCalledWith(new BadRequestError('age, sex, job, politicalOpinion and nationality required'));
+        expect(mockNext).toHaveBeenCalledWith(new BadRequestError('age, sex, job, politicalOpinion, nationality and favoriteGames required'));
     });
 
     it('updateUser met à jour un utilisateur existant et le retourne', async () => {
-        const input = new User(25, 'M', 'Engineer', 'Reconquête', 'French');
-        const updated = new User(25, 'M', 'Unemployed', 'Reconquête', 'French', 1);
+        const input = new User(25, 'M', 'Engineer', 'Reconquête', 'French', [], 1);
+        const updated = new User(25, 'M', 'Unemployed', 'Reconquête', 'French', [], 1);
         mockPort.updateUser.mockResolvedValue(updated);
 
         const mockReq = {
@@ -104,7 +104,7 @@ describe('UserController', () => {
 
         await controller.updateUser(mockReq, mockRes, mockNext);
 
-        expect(mockNext).toHaveBeenCalledWith(new BadRequestError('age, sex, job, politicalOpinion and nationality required'));
+        expect(mockNext).toHaveBeenCalledWith(new BadRequestError('age, sex, job, politicalOpinion, nationality and favoriteGames required'));
     });
 
     it('updateUser renvoie une erreur si l\'ID est invalide', async () => {
@@ -121,7 +121,7 @@ describe('UserController', () => {
     });
 
     it('updateUser renvoie une erreur si l\'utilisateur n\'existe pas', async () => {
-        const input = new User(25, 'M', 'Engineer', 'Reconquête', 'French');
+        const input = new User(25, 'M', 'Engineer', 'Reconquête', 'French', []);
         mockPort.updateUser.mockResolvedValue(null);
         const mockReq = {
             params: { id: '999' },
