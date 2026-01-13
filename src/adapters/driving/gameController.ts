@@ -54,7 +54,7 @@ export class GameController {
       res.status(400).json({ message: 'name, type, indie, multiplayer, competitive, and pegi required'  });
       return;
     }
-    const updated = await this.service.updateGame(new Game(pegi, name, type, indie, multiplayer, competitive, id));
+    const updated = await this.service.updateGame(id, new Game(pegi, name, type, indie, multiplayer, competitive, id));
     res.json(updated);
   }
 }

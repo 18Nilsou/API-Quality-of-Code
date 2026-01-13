@@ -24,12 +24,11 @@ export class InMemoryGameRepo implements GameRepositoryPort {
     return false;
   }
 
-  async update(game: Game): Promise<Game> {
-    const index = this.store.findIndex((s) => s.id === game.id);
-    if (index === -1) {
-      throw new Error('Game not found');
-    }
-    this.store[index] = game;
-    return game;
+  async update(id: number, input: Omit<Game, 'id'>): Promise<Game | null> {
+    const index = this.store.findIndex((s) => s.id === id);
+    if (index === -1) return null;
+    const updatedGame: Game = { ...input, id };
+    this.store[index] = updatedGame;
+    return updatedGame;
   }
 }
