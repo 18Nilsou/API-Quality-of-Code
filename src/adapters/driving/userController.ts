@@ -8,6 +8,7 @@ export class UserController {
 
     private service: UserPort;
     private URL_PREFIX = '/users';
+    private requiredFields = ['age', 'sex', 'job', 'politicalOpinion', 'nationality'];
 
     constructor(private readonly userService: UserPort) {
         this.service = userService;
@@ -26,10 +27,11 @@ export class UserController {
     }
 
     async createUser(req: Request, res: Response, next: Function) {
-        const { age, sex, job, politicalOpinion, nationality } = req.body;
-        if (!age || age <= 0 || !sex || !job || !politicalOpinion || !nationality) {
+        if (!this.checkRequiredFields(req.body)) {
             return next(new BadRequestError('age, sex, job, politicalOpinion and nationality required'));
         }
+
+        const { age, sex, job, politicalOpinion, nationality } = req.body;
 
         const created = await this.service.createUser(new User(age, sex, job, politicalOpinion, nationality));
         res.status(201).json(created);
@@ -39,10 +41,11 @@ export class UserController {
         const id = parseInt(req.params.id, 10);
         if (isNaN(id)) return next(new BadRequestError('User ID must be a number'));
 
-        const { age, sex, job, politicalOpinion, nationality } = req.body;
-        if (!age || age <= 0 || !sex || !job || !politicalOpinion || !nationality) {
+        if (!this.checkRequiredFields(req.body)) {
             return next(new BadRequestError('age, sex, job, politicalOpinion and nationality required'));
         }
+
+        const { age, sex, job, politicalOpinion, nationality } = req.body;
 
         const updated = await this.service.updateUser(id, new User(age, sex, job, politicalOpinion, nationality));
         if (!updated) return next(new NotFoundError('User not found'));
@@ -57,5 +60,14 @@ export class UserController {
         if (!deleted) return next(new NotFoundError('User not found'));
 
         res.status(204).send();
+    }
+
+    private checkRequiredFields(body: any): boolean {
+        for (const field of this.requiredFields) {
+            if (!(field in body)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
