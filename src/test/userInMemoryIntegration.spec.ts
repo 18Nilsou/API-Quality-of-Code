@@ -1,62 +1,55 @@
 import { InMemoryUserRepo } from "../adapters/driven/inMemoryUserRepo";
 import { User } from "../domain/user";
+import { UserService } from "../services/userService";
 
 describe('userInMemoryIntegration', () => {
-    let repo: InMemoryUserRepo;
-    let users: User[] = [];
+        
+    let repo : InMemoryUserRepo;
+    let service : UserService;
 
     beforeEach(async () => {
-        users = [];
-        repo = new InMemoryUserRepo(users);
+        repo = new InMemoryUserRepo();
+        service = new UserService(repo);
     })
 
-    it('should save a user', async () => {
-        const userData = new User(25, 'M', 'Engineer', 'Reconquête', 'French', []);
-        const savedUser = await repo.save(userData);
-        const users = await repo.findAll();
-
-        expect(savedUser).toHaveProperty('id');
-        expect(users.length).toBe(1);
-        expect(users[0]).toEqual(savedUser);
+    it('listUsers retourne la liste fournie par le repo', async () => {
+        const sample: User[] = [new User(25, 'M', 'Engineer', 'Reconquête', 'French', [], 1), new User(30, 'F', 'Unemployed', 'RN', 'French', [], 2)];
+        repo.save(sample[0]);
+        repo.save(sample[1]);
+        await expect(service.listUsers()).resolves.toEqual(sample);
     });
 
-    it('should update a user', async () => {
-        const userData = new User(25, 'M', 'Engineer', 'Reconquête', 'French', []);
-        const savedUser = await repo.save(userData);
-        const tempUsers = await repo.findAll();
-        const updatedData = new User(26, 'M', 'Engineer', 'Reconquête', 'French', [], savedUser.id);
-        const updatedUser = await repo.update(savedUser.id!, updatedData);
-        const users = await repo.findAll();
-
-        expect(updatedUser).not.toBeNull();
-        expect(updatedUser?.age).toBe(26);
-        expect(users.length).toBe(1);
-        expect(tempUsers[0]).toEqual(savedUser);
-        expect(users[0]).toEqual(updatedUser);
+    it('createUser appelle save et retourne l\'utilisateur créé', async () => {
+        const input = new User(25, 'M', 'Engineer', 'Reconquête', 'French', []);
+        const { age, sex, job, politicalOpinion, nationality, favoriteGames } = input;
+        const saved = new User(age, sex, job, politicalOpinion, nationality, favoriteGames, 1);
+        await expect(service.createUser(input)).resolves.toEqual(saved);
     });
 
-    it('should return null when updating a non-existing user', async () => {
-        const updatedData = new User(26, 'M', 'Engineer', 'Reconquête', 'French', [], 999);
-        const result = await repo.update(999, updatedData);
-
-        expect(result).toBeNull();
+    it('updateUser appelle update et retourne l\'utilisateur mis à jour', async () => {
+        const input = new User(25, 'M', 'Engineer', 'Reconquête', 'French', [], 1);
+        repo.save(input);
+        const { age, sex, job, politicalOpinion, nationality, favoriteGames, id } = input;
+        const updated = new User(age, sex, 'Unemployed', politicalOpinion, nationality, favoriteGames, id);
+        repo.update(1, updated);
+        await expect(service.updateUser(1, updated)).resolves.toEqual(updated);
     });
 
-    it('should delete a user', async () => {
-        const userData = new User(25, 'M', 'Engineer', 'Reconquête', 'French', []);
-        const savedUser = await repo.save(userData);
-        const tempUsers = await repo.findAll();
-        const deleted = await repo.delete(savedUser.id!);
-        const users = await repo.findAll();
-
-        expect(deleted).toBe(true);
-        expect(tempUsers.length).toBe(1);
-        expect(users.length).toBe(0);
+    it('updateUser retourne null si l\'utilisateur n\'existe pas', async () => {
+        const input = new User(25, 'M', 'Engineer', 'Reconquête', 'French', [], 1);
+        repo.update(999, input);
+        await expect(service.updateUser(999, input)).resolves.toBeNull();
     });
 
-    it('should return false when deleting a non-existing user', async () => {
-        const result = await repo.delete(999);
+    it('deleteUser appelle delete et retourne true si l\'utilisateur a été supprimé', async () => {
+        const sample: User[] = [new User(25, 'M', 'Engineer', 'Reconquête', 'French', [], 1), new User(30, 'F', 'Unemployed', 'RN', 'French', [], 2)];
+        repo.save(sample[0]);
+        repo.save(sample[1]);
+        await expect(service.deleteUser(1)).resolves.toBe(true);
+    });
 
-        expect(result).toBe(false);
+    it('deleteUser retourne false si l\'utilisateur n\'existe pas', async () => {
+        repo.delete(999);
+        await expect(service.deleteUser(999)).resolves.toBe(false);
     });
 });
