@@ -1,51 +1,61 @@
-import { Express } from 'express';
+import { Express, Request, Response } from 'express';
 import { User } from "../../domain/user";
 import { UserPort } from '../../ports/driving/userPort';
-import { Request, Response } from "express";
+import { NotFoundError } from '../../domain/error/notFoundError';
+import { BadRequestError } from '../../domain/error/badRequestError';
 
 export class UserController {
+
     private service: UserPort;
+    private URL_PREFIX = '/users';
 
     constructor(private readonly userService: UserPort) {
         this.service = userService;
     }
 
     registerRoutes(app: Express) {
-        app.get('/users', this.getAllUsers.bind(this));
-        app.post('/users', this.createUser.bind(this));
-        app.put('/users/:id', this.updateUser.bind(this));
-        app.delete('/users/:id', this.deleteUser.bind(this));
+        app.get(this.URL_PREFIX, this.getAllUsers.bind(this));
+        app.post(this.URL_PREFIX, this.createUser.bind(this));
+        app.delete(`${this.URL_PREFIX}/:id`, this.deleteUser.bind(this));
+        app.put(`${this.URL_PREFIX}/:id`, this.updateUser.bind(this));
     }
 
     async getAllUsers(req: Request, res: Response) {
         const list = await this.service.listUsers();
-        res.json(list);
+        res.status(200).json(list);
     }
 
-    async createUser(req: Request, res: Response) {
+    async createUser(req: Request, res: Response, next: Function) {
         const { age, sex, job, politicalOpinion, nationality } = req.body;
-        if (!age || !sex || !job || !politicalOpinion || !nationality) {
-            return res.status(400).json({ message: 'age, sex, job, politicalOpinion and nationality required' });
+        if (!age || age <= 0 || !sex || !job || !politicalOpinion || !nationality) {
+            return next(new BadRequestError('age, sex, job, politicalOpinion and nationality required'));
         }
+
         const created = await this.service.createUser(new User(age, sex, job, politicalOpinion, nationality));
         res.status(201).json(created);
     }
 
-    async updateUser(req: Request, res: Response) {
-        const id = Number(req.params.id);
+    async updateUser(req: Request, res: Response, next: Function) {
+        const id = parseInt(req.params.id, 10);
+        if (isNaN(id)) return next(new BadRequestError('User ID must be a number'));
+
         const { age, sex, job, politicalOpinion, nationality } = req.body;
-        if (!age || !sex || !job || !politicalOpinion || !nationality) {
-            return res.status(400).json({ message: 'age, sex, job, politicalOpinion and nationality required' });
+        if (!age || age <= 0 || !sex || !job || !politicalOpinion || !nationality) {
+            return next(new BadRequestError('age, sex, job, politicalOpinion and nationality required'));
         }
+
         const updated = await this.service.updateUser(id, new User(age, sex, job, politicalOpinion, nationality));
-        if (!updated) return res.status(404).json({ message: 'User not found' });
-        res.json(updated);
+        if (!updated) return next(new NotFoundError('User not found'));
+        res.status(200).json(updated);
     }
 
-    async deleteUser(req: Request, res: Response) {
-        const id = Number(req.params.id);
+    async deleteUser(req: Request, res: Response, next: Function) {
+        const id = parseInt(req.params.id, 10);
+        if (isNaN(id)) return next(new BadRequestError('User ID must be a number'));
+
         const deleted = await this.service.deleteUser(id);
-        if (!deleted) return res.status(404).json({ message: 'User not found' });
+        if (!deleted) return next(new NotFoundError('User not found'));
+
         res.status(204).send();
     }
 }

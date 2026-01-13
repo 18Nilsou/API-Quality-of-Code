@@ -3,6 +3,7 @@ import { UserRepositoryPort } from '../ports/driven/userRepoPort';
 import { UserPort } from "../ports/driving/userPort";
 
 export class UserService implements UserPort {
+
     constructor(private repo: UserRepositoryPort) { }
 
     async listUsers(): Promise<User[]> {
@@ -10,7 +11,6 @@ export class UserService implements UserPort {
     }
 
     async createUser(input: Omit<User, 'id'>): Promise<User> {
-        // Business rules could be applied here
         return this.repo.save(input);
     }
 

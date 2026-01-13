@@ -2,6 +2,7 @@ import { User } from '../../domain/user';
 import { UserRepositoryPort } from '../../ports/driven/userRepoPort';
 
 export class InMemoryUserRepo implements UserRepositoryPort {
+
     constructor(private readonly store: User[] = []) { }
 
     async findAll(): Promise<User[]> {

@@ -1,18 +1,16 @@
-import express, { Express } from 'express';
-import { InMemoryGameRepo } from '../driven/inMemoryGameRepo';
-import { GameService } from '../../services/gameService';
+import { Express, Request, Response } from 'express';
 import { Game } from "../../domain/game";
-import { GameRepositoryPort } from "../../ports/driven/repoPort";
-import { GamePort } from "../../ports/driving/gamePort";
-import {Request, Response} from "express";
+import { GamePort } from '../../ports/driving/gamePort';
+import { BadRequestError } from '../../domain/error/badRequestError';
+import { NotFoundError } from '../../domain/error/notFoundError';
 
 export class GameController {
-  
-  private service: GameService;
+
+  private service: GamePort;
   private URL_PREFIX = '/games';
-  
-  constructor(service: GameService) {
-    this.service = service;
+
+  constructor(private readonly gameService: GamePort) {
+    this.service = gameService;
   }
 
   registerRoutes(app: Express) {
@@ -22,39 +20,42 @@ export class GameController {
     app.put(`${this.URL_PREFIX}/:id`, this.updateGame.bind(this));
   }
 
-  async getAllGames(req: Request, res: Response): Promise<void> {
+  async getAllGames(req: Request, res: Response) {
     const games = await this.service.listGames();
-    res.json(games);
+    res.status(200).json(games);
   }
 
-  async createGame(req: Request, res: Response): Promise<void> {
+  async createGame(req: Request, res: Response, next: Function) {
     const { pegi, name, type, indie, multiplayer, competitive } = req.body;
-    if (pegi === undefined || name === undefined || type === undefined || competitive === undefined || multiplayer === undefined || indie === undefined) {
-      res.status(400).json({ message: 'name, type, indie, multiplayer, competitive, and pegi required' });
-      return;
+    if (!pegi || !name || !type || competitive === undefined || multiplayer === undefined || indie === undefined) {
+      return next(new BadRequestError('pegi, name, type, indie, multiplayer, and competitive required'));
     }
+
     const created = await this.service.createGame(new Game(pegi, name, type, indie, multiplayer, competitive));
     res.status(201).json(created);
   }
 
-  async deleteGame(req: Request, res: Response): Promise<void> {
+  async updateGame(req: Request, res: Response, next: Function) {
     const id = parseInt(req.params.id, 10);
-    if (isNaN(id)) {
-      res.status(400).json({ message: 'Invalid id' });
-      return;
+    if (isNaN(id)) return next(new BadRequestError('Game ID must be a number'));
+
+    const { pegi, name, type, indie, multiplayer, competitive } = req.body;
+    if (!pegi || !name || !type || competitive === undefined || multiplayer === undefined || indie === undefined) {
+      return next(new BadRequestError('pegi, name, type, indie, multiplayer, and competitive required'));
     }
-    await this.service.deleteGame(id);
-    res.status(204).send();
+
+    const updated = await this.service.updateGame(id, new Game(pegi, name, type, indie, multiplayer, competitive, id));
+    if (!updated) return next(new NotFoundError('Game not found'));
+    res.status(200).json(updated);
   }
 
-  async updateGame(req: Request, res: Response): Promise<void> {
+  async deleteGame(req: Request, res: Response, next: Function) {
     const id = parseInt(req.params.id, 10);
-    const { pegi, name, type, indie, multiplayer, competitive } = req.body;
-    if (isNaN(id) || pegi === undefined || name === undefined || type === undefined || competitive === undefined || multiplayer === undefined || indie === undefined) {
-      res.status(400).json({ message: 'name, type, indie, multiplayer, competitive, and pegi required'  });
-      return;
-    }
-    const updated = await this.service.updateGame(id, new Game(pegi, name, type, indie, multiplayer, competitive, id));
-    res.json(updated);
+    if (isNaN(id)) return next(new BadRequestError('Game ID must be a number'));
+
+    const deleted = await this.service.deleteGame(id);
+    if (!deleted) return next(new NotFoundError('Game not found'));
+
+    res.status(204).send();
   }
 }

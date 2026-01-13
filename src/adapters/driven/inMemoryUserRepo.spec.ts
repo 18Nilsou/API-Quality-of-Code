@@ -26,7 +26,7 @@ describe('inMemoryUserRepo', () => {
         const allUsers = await repo.findAll();
 
         expect(allUsers).toEqual(users);
-        expect(allUsers).not.toBe(users); // Ensure it's a copy
+        expect(allUsers).not.toBe(users);
     });
 
     it('should update an existing user', async () => {

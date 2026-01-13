@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import path from 'path';
 import * as fs from "node:fs";
 import * as YAML from 'yaml';
@@ -15,6 +15,7 @@ import { UserService } from "./services/userService";
 import { GameController } from './adapters/driving/gameController';
 import { InMemoryGameRepo } from "./adapters/driven/inMemoryGameRepo";
 import { GameService } from "./services/gameService";
+import { HttpError } from './domain/error/httpError';
 
 const app = express();
 app.use(express.json());
@@ -39,6 +40,14 @@ userController.registerRoutes(app);
 const gameService = new GameService(gameRepo);
 const gameController = new GameController(gameService);
 gameController.registerRoutes(app);
+
+app.use((err: HttpError, req: Request, res: Response, next: Function) => {
+  if (err.statusCode) {
+    res.status(err.statusCode).json({ message: err.message });
+  } else {
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
