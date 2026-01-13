@@ -1,0 +1,21 @@
+meta {
+  name: Create user
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3000/users
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "age": 25,
+    "sex": "M",
+    "job": "Engineer",
+    "politicalOpinion": "Center",
+    "nationality": "French"
+  }
+}
