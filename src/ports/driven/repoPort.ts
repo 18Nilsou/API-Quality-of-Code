@@ -9,8 +9,7 @@ export interface AddressRepositoryPort {
 
 export interface GameRepositoryPort {
   findAll(): Promise<Game[]>;
-  findById(id: number): Promise<Game | null>;
   save(game: Omit<Game, 'id'>): Promise<Game>;
-  delete(id: number): Promise<void>;
+  delete(id: number): Promise<boolean>;
   update(game: Game): Promise<Game>;
 }

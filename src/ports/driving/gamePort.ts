@@ -9,8 +9,7 @@ export interface AddressPort {
 
 export interface GamePort {
   listGames(): Promise<Game[]>;
-  getGame(id: number): Promise<Game | null>;
   createGame(input: Omit<Game, 'id'>): Promise<Game>;
   updateGame(game: Game): Promise<Game>;
-  deleteGame(id: number): Promise<void>;
+  deleteGame(id: number): Promise<boolean>;
 }

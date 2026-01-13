@@ -3,17 +3,14 @@ import { GameRepositoryPort } from '../ports/driven/repoPort';
 import { GamePort } from "../ports/driving/gamePort";
 
 export class GameService implements GamePort {
+  
   constructor(private repo: GameRepositoryPort) {}
-
-  async getGame(id: number): Promise<Game | null> {
-    return this.repo.findById(id);
-  }
 
   async updateGame(game: Game): Promise<Game> {
     return this.repo.update(game);
   }
   
-  async deleteGame(id: number): Promise<void> {
+  async deleteGame(id: number): Promise<boolean> {
     return this.repo.delete(id);
   }
 

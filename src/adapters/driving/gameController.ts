@@ -1,45 +1,60 @@
-import express from 'express';
+import express, { Express } from 'express';
 import { InMemoryGameRepo } from '../driven/inMemoryGameRepo';
 import { GameService } from '../../services/gameService';
 import { Game } from "../../domain/game";
+import { GameRepositoryPort } from "../../ports/driven/repoPort";
+import { GamePort } from "../../ports/driving/gamePort";
+import {Request, Response} from "express";
 
-const router = express.Router();
-
-const repo = new InMemoryGameRepo();
-const service = new GameService(repo);
-
-
-router.get('/', async (req, res) => {
-  const list = await service.listGames();
-  res.json(list);
-});
-
-router.post('/', async (req, res) => {
-  const { pegi, name, type, indie, multiplayer, competitive } = req.body;
-  if (pegi === undefined || name === undefined || type === undefined || competitive === undefined || multiplayer === undefined || indie === undefined) {
-    return res.status(400).json({ message: 'name, type, indie, multiplayer, competitive, and pegi required' });
+export class GameController {
+  
+  private service: GameService;
+  private URL_PREFIX = '/games';
+  
+  constructor(service: GameService) {
+    this.service = service;
   }
-  const created = await service.createGame(new Game(pegi, name, type, indie, multiplayer, competitive));
-  res.status(201).json(created);
-});
 
-router.delete('/:id', async (req, res) => {
-  const id = parseInt(req.params.id, 10);
-  if (isNaN(id)) {
-    return res.status(400).json({ message: 'Invalid id' });
+  registerRoutes(app: Express) {
+    app.get(this.URL_PREFIX, this.getAllGames.bind(this));
+    app.post(this.URL_PREFIX, this.createGame.bind(this));
+    app.delete(`${this.URL_PREFIX}/:id`, this.deleteGame.bind(this));
+    app.put(`${this.URL_PREFIX}/:id`, this.updateGame.bind(this));
   }
-  await service.deleteGame(id);
-  res.status(204).send();
-});
 
-router.put('/:id', async (req, res) => {
-  const id = parseInt(req.params.id, 10);
-  const { pegi, name, type, indie, multiplayer, competitive } = req.body;
-  if (isNaN(id) || pegi === undefined || name === undefined || type === undefined || competitive === undefined || multiplayer === undefined || indie === undefined) {
-    return res.status(400).json({ message: 'name, type, indie, multiplayer, competitive, and pegi required'  });
+  async getAllGames(req: Request, res: Response): Promise<void> {
+    const games = await this.service.listGames();
+    res.json(games);
   }
-  const updated = await service.updateGame(new Game(pegi, name, type, indie, multiplayer, competitive, id));
-  res.json(updated);
-});
 
-export default router;
+  async createGame(req: Request, res: Response): Promise<void> {
+    const { pegi, name, type, indie, multiplayer, competitive } = req.body;
+    if (pegi === undefined || name === undefined || type === undefined || competitive === undefined || multiplayer === undefined || indie === undefined) {
+      res.status(400).json({ message: 'name, type, indie, multiplayer, competitive, and pegi required' });
+      return;
+    }
+    const created = await this.service.createGame(new Game(pegi, name, type, indie, multiplayer, competitive));
+    res.status(201).json(created);
+  }
+
+  async deleteGame(req: Request, res: Response): Promise<void> {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) {
+      res.status(400).json({ message: 'Invalid id' });
+      return;
+    }
+    await this.service.deleteGame(id);
+    res.status(204).send();
+  }
+
+  async updateGame(req: Request, res: Response): Promise<void> {
+    const id = parseInt(req.params.id, 10);
+    const { pegi, name, type, indie, multiplayer, competitive } = req.body;
+    if (isNaN(id) || pegi === undefined || name === undefined || type === undefined || competitive === undefined || multiplayer === undefined || indie === undefined) {
+      res.status(400).json({ message: 'name, type, indie, multiplayer, competitive, and pegi required'  });
+      return;
+    }
+    const updated = await this.service.updateGame(new Game(pegi, name, type, indie, multiplayer, competitive, id));
+    res.json(updated);
+  }
+}
