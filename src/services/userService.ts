@@ -9,10 +9,6 @@ export class UserService implements UserPort {
         return this.repo.findAll();
     }
 
-    async getUser(id: number): Promise<User | null> {
-        return this.repo.findById(id);
-    }
-
     async createUser(input: Omit<User, 'id'>): Promise<User> {
         // Business rules could be applied here
         return this.repo.save(input);

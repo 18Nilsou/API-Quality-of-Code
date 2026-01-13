@@ -1,32 +1,39 @@
-import express from 'express';
-import { InMemoryAddressRepo } from '../driven/inMemoryAddressRepo';
-import { AddressService } from '../../services/addressService';
+import express, { Express } from 'express';
 import { Address } from "../../domain/address";
+import { AddressPort } from "../../ports/driving/addressPort";
+import { Request, Response } from "express";
 
-const router = express.Router();
+export class AddressController {
+  private service: AddressPort;
 
-const repo = new InMemoryAddressRepo();
-const service = new AddressService(repo);
-
-router.get('/', async (req, res) => {
-  const list = await service.listAddresses();
-  res.json(list);
-});
-
-router.post('/', async (req, res) => {
-  const { street, city, zip } = req.body;
-  if (!street || !city || !zip) {
-    return res.status(400).json({ message: 'street, city and zip required' });
+  constructor(private readonly addressService: AddressPort) {
+    this.service = addressService;
   }
-  const created = await service.createAddress(new Address(street, city, zip));
-  res.status(201).json(created);
-});
 
-router.get('/:id', async (req, res) => {
-  const id = req.params.id;
-  const found = await service.getAddress(id);
-  if (!found) return res.status(404).json({ message: 'Not found' });
-  res.json(found);
-});
+  registerRoutes(app: Express) {
+    app.get('/addresses', this.getAllAddresses.bind(this));
+    app.post('/addresses', this.createAddress.bind(this));
+    app.get('/addresses/:id', this.getAddress.bind(this));
+  }
 
-export default router;
+  async getAllAddresses(req: Request, res: Response) {
+    const list = await this.service.listAddresses();
+    res.json(list);
+  }
+
+  async createAddress(req: Request, res: Response) {
+    const { street, city, zip } = req.body;
+    if (!street || !city || !zip) {
+      return res.status(400).json({ message: 'street, city and zip required' });
+    }
+    const created = await this.service.createAddress(new Address(street, city, zip));
+    res.status(201).json(created);
+  }
+
+  async getAddress(req: Request, res: Response) {
+    const id = req.params.id;
+    const found = await this.service.getAddress(id);
+    if (!found) return res.status(404).json({ message: 'Not found' });
+    res.json(found);
+  }
+}

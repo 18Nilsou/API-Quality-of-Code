@@ -1,50 +1,51 @@
-import express from 'express';
-import { InMemoryUserRepo } from '../driven/inMemoryUserRepo';
-import { UserService } from '../../services/userService';
+import { Express } from 'express';
 import { User } from "../../domain/user";
+import { UserPort } from '../../ports/driving/userPort';
+import { Request, Response } from "express";
 
-const router = express.Router();
+export class UserController {
+    private service: UserPort;
 
-const repo = new InMemoryUserRepo();
-const service = new UserService(repo);
-
-router.get('/', async (req, res) => {
-    const list = await service.listUsers();
-    res.json(list);
-});
-
-router.post('/', async (req, res) => {
-    const { age, sex, job, politicalOpinion, nationality } = req.body;
-    if (!age || !sex || !job || !politicalOpinion || !nationality) {
-        return res.status(400).json({ message: 'age, sex, job, politicalOpinion and nationality required' });
+    constructor(private readonly userService: UserPort) {
+        this.service = userService;
     }
-    const created = await service.createUser(new User(age, sex, job, politicalOpinion, nationality));
-    res.status(201).json(created);
-});
 
-router.get('/:id', async (req, res) => {
-    const id = Number(req.params.id);
-    const found = await service.getUser(id);
-    if (!found) return res.status(404).json({ message: 'User not found' });
-    res.json(found);
-});
-
-router.put('/:id', async (req, res) => {
-    const id = Number(req.params.id);
-    const { age, sex, job, politicalOpinion, nationality } = req.body;
-    if (!age || !sex || !job || !politicalOpinion || !nationality) {
-        return res.status(400).json({ message: 'age, sex, job, politicalOpinion and nationality required' });
+    registerRoutes(app: Express) {
+        app.get('/users', this.getAllUsers.bind(this));
+        app.post('/users', this.createUser.bind(this));
+        app.put('/users/:id', this.updateUser.bind(this));
+        app.delete('/users/:id', this.deleteUser.bind(this));
     }
-    const updated = await service.updateUser(id, new User(age, sex, job, politicalOpinion, nationality));
-    if (!updated) return res.status(404).json({ message: 'User not found' });
-    res.json(updated);
-});
 
-router.delete('/:id', async (req, res) => {
-    const id = Number(req.params.id);
-    const deleted = await service.deleteUser(id);
-    if (!deleted) return res.status(404).json({ message: 'User not found' });
-    res.status(204).send();
-});
+    async getAllUsers(req: Request, res: Response) {
+        const list = await this.service.listUsers();
+        res.json(list);
+    }
 
-export default router;
+    async createUser(req: Request, res: Response) {
+        const { age, sex, job, politicalOpinion, nationality } = req.body;
+        if (!age || !sex || !job || !politicalOpinion || !nationality) {
+            return res.status(400).json({ message: 'age, sex, job, politicalOpinion and nationality required' });
+        }
+        const created = await this.service.createUser(new User(age, sex, job, politicalOpinion, nationality));
+        res.status(201).json(created);
+    }
+
+    async updateUser(req: Request, res: Response) {
+        const id = Number(req.params.id);
+        const { age, sex, job, politicalOpinion, nationality } = req.body;
+        if (!age || !sex || !job || !politicalOpinion || !nationality) {
+            return res.status(400).json({ message: 'age, sex, job, politicalOpinion and nationality required' });
+        }
+        const updated = await this.service.updateUser(id, new User(age, sex, job, politicalOpinion, nationality));
+        if (!updated) return res.status(404).json({ message: 'User not found' });
+        res.json(updated);
+    }
+
+    async deleteUser(req: Request, res: Response) {
+        const id = Number(req.params.id);
+        const deleted = await this.service.deleteUser(id);
+        if (!deleted) return res.status(404).json({ message: 'User not found' });
+        res.status(204).send();
+    }
+}
