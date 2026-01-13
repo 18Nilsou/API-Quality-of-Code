@@ -1,6 +1,5 @@
 import { Data } from "../domain/data";
-import { GameRepositoryPort } from "../ports/driven/repoPort";
-import { UserRepositoryPort } from "../ports/driven/userRepoPort";
+import { GameRepositoryPort, UserRepositoryPort } from "../ports/driven/repoPort";
 import { AggregatePort } from "../ports/driving/aggregatePort";
 
 export class AggregateService implements AggregatePort {
