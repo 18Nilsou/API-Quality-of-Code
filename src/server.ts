@@ -1,20 +1,37 @@
 import express from 'express';
+import path from 'path';
+import * as fs from "node:fs";
 import * as YAML from 'yaml';
 import swaggerUi from 'swagger-ui-express';
-import addressController from './adapters/driving/addressController';
-import userController from './adapters/driving/userController';
+
+import { AddressController } from './adapters/driving/addressController';
+import { InMemoryAddressRepo } from "./adapters/driven/inMemoryAddressRepo";
+import { AddressService } from "./services/addressService";
+
+import { UserController } from './adapters/driving/userController';
+import { InMemoryUserRepo } from "./adapters/driven/inMemoryUserRepo";
+import { UserService } from "./services/userService";
+
 import gameController from './adapters/driving/gameController';
-import path from 'path';
 
 const app = express();
 app.use(express.json());
 
-const swaggerPath = path.resolve(__dirname, '..', 'openapi.yaml');
-const swaggerDoc = YAML.parse(swaggerPath);
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
+const addressRepo = new InMemoryAddressRepo();
+const userRepo = new InMemoryUserRepo();
 
-app.use('/addresses', addressController);
-app.use('/users', userController);
+const file = fs.readFileSync('./openapi.yaml', 'utf8')
+const swaggerDocument = YAML.parse(file)
+
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+const addressService = new AddressService(addressRepo);
+const addressController = new AddressController(addressService);
+addressController.registerRoutes(app);
+
+const userService = new UserService(userRepo);
+const userController = new UserController(userService);
+userController.registerRoutes(app);
 app.use('/games', gameController);
 
 const port = process.env.PORT || 3000;
