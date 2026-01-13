@@ -1,4 +1,5 @@
 import { User } from '../../domain/user';
+import { UserRepositoryPort } from '../../ports/driven/repoPort';
 import { InMemoryUserRepo } from './inMemoryUserRepo';
 
 describe('inMemoryUserRepo', () => {

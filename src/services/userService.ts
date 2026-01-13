@@ -1,5 +1,5 @@
 import { User } from '../domain/user';
-import { UserRepositoryPort } from '../ports/driven/userRepoPort';
+import { UserRepositoryPort } from '../ports/driven/repoPort';
 import { UserPort } from "../ports/driving/userPort";
 
 export class UserService implements UserPort {

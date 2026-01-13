@@ -1,5 +1,5 @@
 import { User } from '../../domain/user';
-import { UserRepositoryPort } from '../../ports/driven/userRepoPort';
+import { UserRepositoryPort } from '../../ports/driven/repoPort';
 
 export class InMemoryUserRepo implements UserRepositoryPort {
 
