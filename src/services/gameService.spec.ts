@@ -1,6 +1,5 @@
 import { GameService } from './gameService';
 import { Game } from '../domain/game';
-import { mock } from 'node:test';
 
 describe('GameService', () => {
 
@@ -39,7 +38,7 @@ describe('GameService', () => {
         expect(mockRepo.save).toHaveBeenCalledWith(input);
     });
 
-   it('deleteGame appelle delete du repo avec le bon id', async () => {
+    it('deleteGame appelle delete du repo avec le bon id', async () => {
         const idToDelete = 1;
         mockRepo.delete.mockResolvedValue(true);
         await service.deleteGame(idToDelete);

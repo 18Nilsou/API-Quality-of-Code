@@ -17,18 +17,24 @@ export class AggregateService implements AggregatePort {
         const users = await this.userRepo.findAll();
         const games = await this.gameRepo.findAll();
 
-        const gameTypes = games.filter(game => game.type === input).map(game => game.name);
-        const politicalOpinions = users.filter(user => user.favoriteGames.some(favGame => gameTypes.includes(favGame))).map(user => user.politicalOpinion);
+        const gameNames = new Set(
+            games
+                .filter(game => game.type === input)
+                .map(game => game.name)
+        );
 
-        const uniqueOpinions = Array.from(new Set(politicalOpinions));
         const opinionCounts = new Map<string, number>();
-        politicalOpinions.forEach(opinion => {
-            opinionCounts.set(opinion, (opinionCounts.get(opinion) ?? 0) + 1);
-        });
-        uniqueOpinions.sort((a, b) => (opinionCounts.get(b) ?? 0) - (opinionCounts.get(a) ?? 0));
-        uniqueOpinions.reverse();
-        uniqueOpinions.splice(3);
 
-        return uniqueOpinions;
+        users
+            .filter(user => user.favoriteGames.some(fav => gameNames.has(fav)))
+            .forEach(user => {
+                const opinion = user.politicalOpinion;
+                opinionCounts.set(opinion, (opinionCounts.get(opinion) ?? 0) + 1);
+            });
+
+        return Array.from(opinionCounts.entries())
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 3)
+            .map(([opinion]) => opinion);
     }
 }
