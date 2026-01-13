@@ -6,8 +6,8 @@ export class GameService implements GamePort {
   
   constructor(private repo: GameRepositoryPort) {}
 
-  async updateGame(game: Game): Promise<Game> {
-    return this.repo.update(game);
+  async updateGame(id: number, input: Omit<Game, 'id'>): Promise<Game | null> {
+    return this.repo.update(id, input);
   }
   
   async deleteGame(id: number): Promise<boolean> {

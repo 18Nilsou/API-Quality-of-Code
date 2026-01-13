@@ -11,5 +11,5 @@ export interface GameRepositoryPort {
   findAll(): Promise<Game[]>;
   save(game: Omit<Game, 'id'>): Promise<Game>;
   delete(id: number): Promise<boolean>;
-  update(game: Game): Promise<Game>;
+  update(id: number, input: Omit<Game, 'id'>): Promise<Game | null>;
 }

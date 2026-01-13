@@ -8,7 +8,7 @@ describe('GameService', () => {
         findAll: jest.Mock<Promise<Game[]>, []>;
         save: jest.Mock<Promise<Game>, [Omit<Game, 'id'>]>;
         delete: jest.Mock<Promise<boolean>, [number]>;
-        update: jest.Mock<Promise<Game>, [Partial<Game>]>;
+        update: jest.Mock<Promise<Game | null>, [number, Omit<Game, 'id'>]>;
     };
 
     let service: GameService;
@@ -46,11 +46,26 @@ describe('GameService', () => {
         expect(mockRepo.delete).toHaveBeenCalledWith(idToDelete);
     });
 
+    it('deleteGame appelle delete du repo avec le mauvais id', async () => {
+        const idToDelete = 999;
+        mockRepo.delete.mockResolvedValue(false);
+        await service.deleteGame(idToDelete);
+        expect(mockRepo.delete).toHaveBeenCalledWith(idToDelete);
+    });
+
     it('updateGame appelle update du repo et retourne le jeu mis à jour', async () => {
         const input = new Game(18, "Game1", "Action", true, false, true, 1);
         const updatedGame = new Game(18, "Game1 Updated", "Action", true, false, true, 1);
         mockRepo.update.mockResolvedValue(updatedGame);
-        await expect(service.updateGame(input)).resolves.toEqual(updatedGame);
-        expect(mockRepo.update).toHaveBeenCalledWith(input);
+        await expect(service.updateGame(1, input)).resolves.toEqual(updatedGame);
+        expect(mockRepo.update).toHaveBeenCalledWith(1, input);
     });
+
+    it('updateGame appelle update du repo avec un mauvais id', async () => {
+        const input = new Game(18, "Game1", "Action", true, false, true, 1);
+        mockRepo.update.mockResolvedValue(null);
+        await expect(service.updateGame(99, input)).resolves.toBeNull();
+        expect(mockRepo.update).toHaveBeenCalledWith(99, input);
+    });
+
 });
