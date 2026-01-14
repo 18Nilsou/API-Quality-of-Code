@@ -1,6 +1,4 @@
 import { Address } from '../../domain/address';
-import { AddressRepositoryPort } from '../../ports/driven/repoPort';
-import { v4 as uuidv4 } from 'uuid';
 import { InMemoryAddressRepo } from './inMemoryAddressRepo';
 
 describe('inMemoryAddressRepo', () => {
