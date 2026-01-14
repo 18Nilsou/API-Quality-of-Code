@@ -1,7 +1,6 @@
 import { GameController } from './gameController';
 import { Game } from '../../domain/game';
 import { NotFoundError } from '../../domain/error/notFoundError';
-import { BadRequestError } from '../../domain/error/badRequestError';
 import { AggregateController } from './aggregateController';
 import { Data } from '../../domain/data';
 import { User } from '../../domain/user';
