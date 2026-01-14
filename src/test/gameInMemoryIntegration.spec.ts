@@ -21,10 +21,16 @@ describe('GameService', () => {
 
     it('createGame appelle save et retourne le jeu créé', async () => {
         const input = new Game(18, "Game1", "Action", true, false, true);
-        const { pegi, name, type, indie, multiplayer, competitive } = input;
-        const saved = new Game(pegi, name, type, indie, multiplayer, competitive, 2);
-        await repo.save(saved);
-        await expect(service.createGame(input)).resolves.toEqual(saved);
+        const result = await service.createGame(input);
+        expect(result).toMatchObject({
+            pegi: input.pegi,
+            name: input.name,
+            type: input.type,
+            indie: input.indie,
+            multiplayer: input.multiplayer,
+            competitive: input.competitive
+        });
+        expect(result.id).toBeDefined();
     });
 
    it('deleteGame appelle delete du repo avec le bon id', async () => {
