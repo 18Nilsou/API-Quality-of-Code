@@ -210,7 +210,7 @@ paths:
           schema:
             type: string
           required: true
-          description: political opinion of the users
+          description: type of the game (e.g., Action, Adventure)
       responses:
         '200':
           description: Ok
@@ -234,7 +234,6 @@ components:
         - name
         - type
         - pegi
-        - award
         - indie
         - multiplayer
         - competitive
@@ -247,8 +246,6 @@ components:
           type: string
         pegi:
           type: integer
-        award:
-          type: boolean
         indie:
           type: boolean
         multiplayer:

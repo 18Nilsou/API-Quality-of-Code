@@ -83,7 +83,7 @@ describe('usersDataBaseIntegration', () => {
     it('updateUser appelle update et retourne l\'utilisateur mis à jour', async () => {
         const input = new User(25, 'M', 'Engineer', 'Reconquête', 'French', [], 1);
         await repo.save(input);
-        const { age, sex, job, politicalOpinion, nationality, favoriteGames, id } = input;
+        const { age, sex, politicalOpinion, nationality, favoriteGames, id } = input;
         const updated = new User(age, sex, 'Unemployed', politicalOpinion, nationality, favoriteGames, id);
         await repo.update(1, updated);
         await expect(service.updateUser(1, updated)).resolves.toEqual(updated);
