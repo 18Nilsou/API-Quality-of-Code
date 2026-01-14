@@ -1,4 +1,3 @@
-import { GameController } from './gameController';
 import { Game } from '../../domain/game';
 import { NotFoundError } from '../../domain/error/notFoundError';
 import { AggregateController } from './aggregateController';
