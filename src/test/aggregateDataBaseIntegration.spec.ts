@@ -13,13 +13,34 @@ describe('aggregateDataBaseIntegration', () => {
     let testPool: Pool;
 
     beforeAll(async () => {
-        // Create a dedicated pool for this test suite
+        // First, connect to the default postgres database to create the test database if it doesn't exist
+        const adminPool = new Pool({
+            host: process.env.DB_HOST || 'localhost',
+            port: parseInt(process.env.DB_PORT || '5432'),
+            user: process.env.DB_USER || 'postgres',
+            password: process.env.DB_PASSWORD || 'your_password',
+            database: 'postgres', // Connect to default postgres database
+        });
+
+        try {
+            // Create test database if it doesn't exist
+            await adminPool.query('CREATE DATABASE qoc_db_test');
+        } catch (error: any) {
+            // Database might already exist (error code 42P04), that's ok
+            if (error.code !== '42P04') {
+                console.error('Error creating test database:', error);
+            }
+        } finally {
+            await adminPool.end();
+        }
+
+        // Now create a dedicated pool for this test suite using TEST database
         testPool = new Pool({
             host: process.env.DB_HOST || 'localhost',
             port: parseInt(process.env.DB_PORT || '5432'),
             user: process.env.DB_USER || 'postgres',
             password: process.env.DB_PASSWORD || 'your_password',
-            database: process.env.DB_NAME || 'qoc_db',
+            database: 'qoc_db_test', // Always use test database
         });
         
         // Create tables if necessary
@@ -52,8 +73,8 @@ describe('aggregateDataBaseIntegration', () => {
         // Clean tables before each test
         await testPool.query('TRUNCATE users, games RESTART IDENTITY CASCADE');
         
-        userRepo = new PostgresUserRepo();
-        gameRepo = new PostgresGameRepo();
+        userRepo = new PostgresUserRepo(testPool);
+        gameRepo = new PostgresGameRepo(testPool);
         aggregateService = new AggregateService(userRepo, gameRepo);
     });
 
