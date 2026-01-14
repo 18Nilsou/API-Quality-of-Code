@@ -9,13 +9,17 @@ import { InMemoryAddressRepo } from "./adapters/driven/inMemoryAddressRepo";
 import { AddressService } from "./services/addressService";
 
 import { UserController } from './adapters/driving/userController';
-import { InMemoryUserRepo } from "./adapters/driven/inMemoryUserRepo";
+//import { InMemoryUserRepo } from "./adapters/driven/inMemoryUserRepo";
+import { PostgresUserRepo } from "./adapters/driven/postgresUserRepo";
 import { UserService } from "./services/userService";
 
 import { GameController } from './adapters/driving/gameController';
-import { InMemoryGameRepo } from "./adapters/driven/inMemoryGameRepo";
+//import { InMemoryGameRepo } from "./adapters/driven/inMemoryGameRepo";
+import { PostgresGameRepo } from "./adapters/driven/postgresGameRepo";
 import { GameService } from "./services/gameService";
+
 import { HttpError } from './domain/error/httpError';
+
 import { AggregateService } from './services/aggregateService';
 import { AggregateController } from './adapters/driving/aggregateController';
 
@@ -23,8 +27,11 @@ const app = express();
 app.use(express.json());
 
 const addressRepo = new InMemoryAddressRepo();
-const userRepo = new InMemoryUserRepo();
-const gameRepo = new InMemoryGameRepo();
+//const userRepo = new InMemoryUserRepo();
+//const gameRepo = new InMemoryGameRepo();
+
+const userRepo = new PostgresUserRepo();
+const gameRepo = new PostgresGameRepo();
 
 const file = fs.readFileSync('./openapi.yaml', 'utf8')
 const swaggerDocument = YAML.parse(file)
