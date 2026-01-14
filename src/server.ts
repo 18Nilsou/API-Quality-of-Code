@@ -46,8 +46,8 @@ const addressRepo = new InMemoryAddressRepo();
 const userRepo = new PostgresUserRepo(pool);
 const gameRepo = new PostgresGameRepo(pool);
 
-const file = fs.readFileSync('./openapi.yaml', 'utf8')
-const swaggerDocument = YAML.parse(file)
+const file = fs.readFileSync('./openapi.yaml', 'utf8');
+const swaggerDocument = YAML.parse(file);
 
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
