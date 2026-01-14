@@ -1,7 +1,6 @@
-import express, { Express } from 'express';
+import { Express, Request, Response } from 'express';
 import { Address } from "../../domain/address";
 import { AddressPort } from "../../ports/driving/addressPort";
-import { Request, Response } from "express";
 
 export class AddressController {
   private service: AddressPort;
