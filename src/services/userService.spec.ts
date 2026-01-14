@@ -38,7 +38,7 @@ describe('UserService', () => {
 
     it('updateUser appelle update et retourne l\'utilisateur mis à jour', async () => {
         const input = new User(25, 'M', 'Engineer', 'Reconquête', 'French', [], 1);
-        const { age, sex, job, politicalOpinion, nationality, favoriteGames, id } = input;
+        const { age, sex, politicalOpinion, nationality, favoriteGames, id } = input;
         const updated = new User(age, sex, 'Unemployed', politicalOpinion, nationality, favoriteGames, id);
         mockRepo.update.mockResolvedValue(updated);
         await expect(service.updateUser(1, input)).resolves.toEqual(updated);
