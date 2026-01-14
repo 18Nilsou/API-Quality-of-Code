@@ -7,6 +7,7 @@ const config: Config.InitialOptions = {
   roots: ['<rootDir>/src'],
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
   testMatch: ['**/?(*.)+(spec|test).[tj]s?(x)'],
+  maxWorkers: 1, // Run tests sequentially to avoid database conflicts
 };
 
 export default config;

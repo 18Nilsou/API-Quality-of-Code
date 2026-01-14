@@ -22,9 +22,22 @@ import { HttpError } from './domain/error/httpError';
 
 import { AggregateService } from './services/aggregateService';
 import { AggregateController } from './adapters/driving/aggregateController';
+import { pool } from './config/db';
 
 const app = express();
 app.use(express.json());
+
+async function runMigrations() {
+  try {
+    console.log('Running database migrations...');
+    const sql = fs.readFileSync(path.join(__dirname, 'migration/init.sql'), 'utf8');
+    await pool.query(sql);
+    console.log('Migrations completed successfully');
+  } catch (error) {
+    console.error('Migration failed:', error);
+    throw error;
+  }
+}
 
 const addressRepo = new InMemoryAddressRepo();
 //const userRepo = new InMemoryUserRepo();
@@ -63,7 +76,19 @@ app.use((err: HttpError, req: Request, res: Response, next: Function) => {
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Server listening on http://localhost:${port}`);
-  console.log(`Swagger docs at http://localhost:${port}/docs`);
-});
+
+// Start server after running migrations
+async function startServer() {
+  try {
+    await runMigrations();
+    app.listen(port, () => {
+      console.log(`Server listening on http://localhost:${port}`);
+      console.log(`Swagger docs at http://localhost:${port}/docs`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+startServer();
