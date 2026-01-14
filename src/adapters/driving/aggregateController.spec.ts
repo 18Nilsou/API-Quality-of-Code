@@ -55,15 +55,6 @@ describe('AggregateController', () => {
 
 
     it('listPoliticalOpinionsPerGameType retourne le top 3 des partie politique en fonction du type de jeu', async () => {
-        const gameList = [new Game(18, "Game1", "Action", true, false, true),
-            ];
-        const userList = [new User(25, 'M', 'Engineer', 'PS', 'French', ["Game1"], 1),
-            new User(30, 'F', 'Unemployed', 'PS', 'French', ["Game1"], 2),
-            new User(22, 'M', 'Student', 'LFI', 'French', ["Game1"], 3),
-            new User(28, 'F', 'Artist', 'PS', 'French', ["Game1"], 4),
-            new User(35, 'M', 'Teacher', 'PS', 'French', ["Game1"], 5),
-            new User(40, 'F', 'Doctor', 'LFI', 'French', ["Game1"], 6),
-            ];
         const sample = ['PS', 'LFI', 'Reconquête'];
 
         mockPort.listPoliticalOpinionsPerGameType.mockResolvedValue(sample);
