@@ -49,7 +49,7 @@ describe('userInMemoryIntegration', () => {
     });
 
     it('deleteUser retourne false si l\'utilisateur n\'existe pas', async () => {
-        repo.delete(999);
+        await repo.delete(999);
         await expect(service.deleteUser(999)).resolves.toBe(false);
     });
 });
