@@ -234,7 +234,6 @@ components:
         - name
         - type
         - pegi
-        - award
         - indie
         - multiplayer
         - competitive
@@ -247,8 +246,6 @@ components:
           type: string
         pegi:
           type: integer
-        award:
-          type: boolean
         indie:
           type: boolean
         multiplayer:
