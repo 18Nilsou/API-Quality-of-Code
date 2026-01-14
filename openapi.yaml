@@ -210,7 +210,7 @@ paths:
           schema:
             type: string
           required: true
-          description: political opinion of the users
+          description: type of the game (e.g., Action, Adventure)
       responses:
         '200':
           description: Ok
