@@ -1,0 +1,20 @@
+meta {
+  name: Create game
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:3000/games
+  body: json
+  auth: none
+}
+
+body:json {
+  "pegi":12,
+  "name":"Another Game",
+  "type":"Action",
+  "indie":false,
+  "multiplayer":true,
+  "competitive":true
+}

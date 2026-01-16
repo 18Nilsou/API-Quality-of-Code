@@ -1,0 +1,289 @@
+openapi: 3.0.0
+info:
+  title: QoC API
+  description: Documentation Swagger pour une API exemple.
+  version: 0.0.1
+servers:
+  - url: http://localhost:3000
+
+paths:
+  /games:
+    get:
+      summary: Get games
+      tags:
+        - Games
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Game'
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+    post:
+      summary: Create a game
+      tags:
+        - Games
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Game'
+      responses:
+        '201':
+          description: Ok 
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+  /games/{id}:  
+    put:
+      summary: Update a game
+      tags:
+        - Games
+      parameters:
+        - in: path 
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: id of the game
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Game'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    delete:
+      summary: Delete a game
+      tags:
+        - Games
+      parameters:
+        - in: path 
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: id of the game
+      responses:
+        '204':
+          description: Ok
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  
+  /users:
+    get:
+      summary: Get users
+      tags:
+        - Users
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+    post:
+      summary: Create a user
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: Ok 
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+  /users/{id}:  
+    put:
+      summary: Update a user
+      tags:
+        - Users
+      parameters:
+        - in: path 
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: id of the user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    delete:
+      summary: Delete a user
+      tags:
+        - Users
+      parameters:
+        - in: path 
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: id of the user
+      responses:
+        '204':
+          description: Ok
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+          
+  /data:
+    get:
+      summary: Get all data
+      tags:
+        - Aggregate
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Data'
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+  /data/game-type/{type}:
+    get:
+      summary: Get top 3 political opinion per game type
+      tags:
+        - Aggregate
+      parameters:
+        - in: path 
+          name: type
+          schema:
+            type: string
+          required: true
+          description: type of the game (e.g., Action, Adventure)
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+components:
+  schemas:
+    Game:
+      type: object
+      required:
+        - name
+        - type
+        - pegi
+        - indie
+        - multiplayer
+        - competitive
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        type:
+          type: string
+        pegi:
+          type: integer
+        indie:
+          type: boolean
+        multiplayer:
+          type: boolean
+        competitive:
+          type: boolean
+    User:
+      type: object
+      required:
+        - age
+        - sex
+        - job
+        - politicalOpinion
+        - nationality
+      properties:
+        id:
+          type: integer
+        age:
+          type: integer
+        sex:
+          type: string
+        job:
+          type: string
+        politicalOpinion:
+          type: string
+        nationality:
+          type: string
+    Data:
+      type: object
+      required:
+        - games
+        - users
+      properties:
+        games:
+          type: array
+          items:
+            $ref: '#/components/schemas/Game'
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
